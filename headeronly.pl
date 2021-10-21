@@ -11,7 +11,7 @@
 # Date: Oct 21st 2021                                      #
 # Desc: Take a C module and convert to a header only file  #
 # to include. Module must be corresponding x.c && x.h, and #
-# the header must be wrapped in a #ifndef _X_H_.           #
+# the header must be wrapped in a #ifndef _FILE_H_.        #
 #==========================================================#
 # Usage:                                                   #
 #   ./headeronly.pl [file.c] [file.h]                      #
@@ -43,8 +43,10 @@ my $h = $ARGV[1];
 $c = abs_path($c);
 $h = abs_path($h);
 
-# snip off file names for later
-my $include = get_include_name($c);
+# snip off file names for include statement
+my $include = $c;
+$include =~ s{^.*/}{};
+$include = "#include \"" . $path . "\"";
 
 # open up a new file to dump lines into
 open(HEADER, '>', "headeronly.h") or die $!;
@@ -67,12 +69,7 @@ while(<DOTC>) {
 # print closing endif
 print HEADER "#endif";
 
+# close all files
 close(HEADER);
 close(DOTC);
 close(DOTH);
-
-sub get_include_name {
-  my $path = @_;
-  $path =~ s{^.*/}{};
-  return "#include \"".$path."\"";
-}
