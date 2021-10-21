@@ -14,7 +14,7 @@
 # the header must be wrapped in a #ifndef _X_H_.           #
 #==========================================================#
 # Usage:                                                   #
-#   ./headeronly.pl [x.c] [x.h]                            #
+#   ./headeronly.pl [file.c] [file.h]                      #
 #                                                          #
 # x.c is the implementation file.                          #
 # x.h is the associated header file.                       #
@@ -31,7 +31,7 @@ use Cwd 'abs_path';
 my $argc = $#ARGV + 1;
 if ($argc != 2) {
   print "Error parsing arguments.\n";
-  print "Usage: ./headeronly.pl [x.c] [x.h]\n";
+  print "Usage: ./headeronly.pl [file.c] [file.h]\n";
   exit -1;
 }
 
