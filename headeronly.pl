@@ -46,27 +46,49 @@ $h = abs_path($h);
 # snip off file names for include statement
 my $include = $c;
 $include =~ s{^.*/}{};
-$include = "#include \"" . $path . "\"";
+my $outputname = $h;
+$outputname =~ s{^.*/}{};
+$outputname = "headeronly-" . $outputname;
+
+
+$include = "#include \"" . $include . "\"";
 
 # open up a new file to dump lines into
-open(HEADER, '>', "headeronly.h") or die $!;
+open(HEADER, '>', $outputname) or die $!;
 open(DOTC, '<', $c);
 open(DOTH, '<', $h);
 
 # print all but the closing endif of the header
-while(<DOTH>) {
-  if (not ($_ eq "#endif")) {
-    print HEADER $_;
+while(my $line = <DOTH>) {
+  if (not ($line eq "#endif")) {
+    print HEADER $line;
   }
 }
+
 print HEADER "/* beginning implementation code */";
-# print all but the header include statement
-while(<DOTC>) {
-  if (not ($_ eq $include)) {
-    print HEADER $_;
+
+# print all but the header include statement and main()
+while(my $line = <DOTC>) {
+  if ($line =~ /int main/){
+    # count occurences
+    my $countup = () = $line =~ /{/g;
+    my $countdown = () = $line =~ /}/g;
+    my $stack = $countup + $countdown;
+    # while we have unmatched brackets
+    while ($stack > 0) {
+      $line = <DOTC>;
+      $countup = () = $line =~ /{/g;
+      $countdown = () = $line =~ /}/g;
+      $stack = $stack + $countup;
+      $stack = $stack - $countdown;
+    }
+  }
+  if (not $line eq $include) {
+    print HEADER $line;
   }
 }
-# print closing endif
+
+# append closing endif
 print HEADER "#endif";
 
 # close all files
