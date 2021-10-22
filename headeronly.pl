@@ -83,7 +83,7 @@ while(my $line = <DOTC>) {
       $stack = $stack - $countdown;
     }
   }
-  if (not $line eq $include) {
+  elsif (not $line eq $include) {
     print HEADER $line;
   }
 }
