@@ -49,8 +49,6 @@ $include =~ s{^.*/}{};
 my $outputname = $h;
 $outputname =~ s{^.*/}{};
 $outputname = "headeronly-" . $outputname;
-
-
 $include = "#include \"" . $include . "\"";
 
 # open up a new file to dump lines into
@@ -58,14 +56,15 @@ open(HEADER, '>', $outputname) or die $!;
 open(DOTC, '<', $c);
 open(DOTH, '<', $h);
 
-# print all but the closing endif of the header
+# print all but the closing endif of the header 
+# TODO: fix this so that it only removes the matching endif
 while(my $line = <DOTH>) {
-  if (not ($line eq "#endif")) {
+  if (not ($line =~ /#endif/)) {
     print HEADER $line;
   }
 }
 
-print HEADER "/* beginning implementation code */";
+print HEADER "\n/* beginning implementation code */\n\n";
 
 # print all but the header include statement and main()
 while(my $line = <DOTC>) {
